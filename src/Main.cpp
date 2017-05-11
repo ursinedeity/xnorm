@@ -5,7 +5,8 @@
  */
 
 #include "Main.h"
-
+#include "PairReads.h"
+#include <unistd.h>
 
 int main(int argc, char* argv[]){
     int optc;

@@ -8,7 +8,6 @@
 #define _PAIRREADS
 #include "Alignment.h"
 #include <fstream>
-#include <string>
 #include <vector>
 
 #define MAXINSERT 2147183647

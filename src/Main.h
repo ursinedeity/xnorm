@@ -4,11 +4,9 @@
  * Refer to the LICENSE file included.
  */
 
-#ifndef _XNORM_T
-#define _XNORM_T
+#ifndef _XNORM_COMMON
+#define _XNORM_COMMON
 
-#include "PairReads.h"
 #include <iostream>
-#include <unistd.h>
 
 #endif //_XNORM_T
