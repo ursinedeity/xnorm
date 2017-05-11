@@ -6,7 +6,7 @@ TARGET := xnorm
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -Wall -O3 -std=c++11
+CFLAGS := -Wall -O3 -std=c++0x
 LIB := 
 INC := -I include
 
