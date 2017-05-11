@@ -122,7 +122,10 @@ PairReads::PairReads(const std::string &pairFile,
     this->ligationJunction = ligationJunction;
     this->insertLength = insertLength;
     this->mapqCutoff = mapqCutoff;
+    //initialize variables
     isWaiting = false;
+    headerChrInProcess=true;
+    totalCount=0,hicCount=0,ctlCount=0,rlgCount=0,sglCount=0,jkCount=0;
     last = new Alignment; current = new Alignment;
 }
 

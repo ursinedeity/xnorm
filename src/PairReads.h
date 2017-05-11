@@ -45,9 +45,9 @@ private:
     bool isWaiting;
     
     std::vector<Chromosome> chromosomes;
-    bool headerChrInProcess=true;
+    bool headerChrInProcess;
     
-    int totalCount=0,hicCount=0,ctlCount=0,rlgCount=0,sglCount=0,jkCount=0;
+    int totalCount,hicCount,ctlCount,rlgCount,sglCount,jkCount;
     void ProcessPair();
     void WriteControl(const Alignment &alignment);
     void WritePairlist();
