@@ -1,9 +1,10 @@
 /**
  * Copyright 2017 University of Southern California
  * Licensed under GPLv2 or any later version
- * Refer to the license.txt file included.
+ * Refer to the license file included.
  */
-#include "xnorm.h"
+#include "PairReads.h"
+#include <iostream>
 #include <sstream>
 #include <algorithm>
 

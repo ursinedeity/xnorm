@@ -1,9 +1,9 @@
 /**
  * Copyright 2017 University of Southern California
  * Licensed under GPLv2 or any later version
- * Refer to the license.txt file included.
+ * Refer to the LICENSE file included.
  */
-#include "xnorm.h"
+#include "Alignment.h"
 #include <sstream>
 
 bool ChromosomeOrder(const std::string &chrom1, const std::string &chrom2){

@@ -1,12 +1,10 @@
 /**
  * Copyright 2017 University of Southern California
  * Licensed under GPLv2 or any later version
- * Refer to the license.txt file included.
+ * Refer to the LICENSE file included.
  */
 
-#include "xnorm.h"
-
-#include <unistd.h>
+#include "Main.h"
 
 
 int main(int argc, char* argv[]){

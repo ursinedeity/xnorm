@@ -1,40 +1,17 @@
 /**
  * Copyright 2017 University of Southern California
  * Licensed under GPLv2 or any later version
- * Refer to the license.txt file included.
+ * Refer to the LICENSE file included.
  */
 
-#ifndef _XNORM_T
-#define _XNORM_T
-
-#include <iostream>
+#ifndef _PAIRREADS
+#define _PAIRREADS
+#include "Alignment.h"
 #include <fstream>
-
 #include <string>
 #include <vector>
 
-#define UNMAPPED 4
-#define REVERSE 16
 #define MAXINSERT 2147183647
-
-bool ChromosomeOrder(const std::string &chrom1, const std::string &chrom2);
-
-struct Alignment{
-    bool unmapped,strand,isValid;
-    int mapq,pos;
-    std::string qname,rname,cigar;
-    std::string sequence;
-    
-    void ParseAlignment(const std::string &line, const int &mapqCutoff);
-    
-    bool HasCuttingSiteSignature(const std::string &enzymeSite);
-    bool operator > (const Alignment &a) const;
-    //alignment representation
-    std::string Representation();
-};
-
-
-/**********************************************************/
 
 struct Chromosome{
     std::string chrom;
@@ -48,8 +25,6 @@ struct Chromosome{
     }
 };
 
-/**********************************************************/
-//Sorting pair of alignments and process them
 class PairReads{
 public:
     bool AddAlignment(const std::string &line);
@@ -80,5 +55,4 @@ private:
     void OutputHeader();
 };
 
-/*********************************************************/
-#endif //_XNORM_T
+#endif
