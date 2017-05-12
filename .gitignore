@@ -1,6 +1,8 @@
 # ignore build
 #
 build
+*.out
+localtest.cpp
 
 #ignore executable
 xnorm

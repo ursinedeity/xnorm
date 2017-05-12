@@ -31,12 +31,12 @@ public:
     
     PairReads(const std::string &pairFile,
               const std::string &controlFile,
-              const std::string &enzymeSite,
-              const std::string &ligationJunction,
+              const std::string &enzyme,
               const int &insertLength,
               const int &mapqCutoff);
     ~PairReads();
     void PrintStats();
+    void PrintArgs();
 private:
     std::ofstream pairlist,control;
     std::string enzymeSite,ligationJunction;

@@ -8,15 +8,14 @@
 #include "PairReads.h"
 #include <unistd.h>
 
-int main(int argc, char* argv[]){
+void ParseSam(int argc, char* argv[]){
     int optc;
     int insertLength = 1000;
     int mapqCutoff = 30;
     std::string pairlistFile("output.pairs");
     std::string controlFile("output.ctl");
-    std::string enzymeSite("GATC");
-    std::string ligationJunction("GATCGATC");
-    std::ios_base::sync_with_stdio(false);
+    std::string enzyme("^GATC");
+    
     // parse arguments
     // l:inseart length default 1000bp
     // q:map quality cutoff default 30
@@ -29,7 +28,7 @@ int main(int argc, char* argv[]){
                 controlFile = optarg;
                 break;
             case 'e':
-                enzymeSite = optarg;
+                enzyme = optarg;
                 break;
             case 'l':
                 insertLength = std::stoi(optarg);
@@ -50,7 +49,8 @@ int main(int argc, char* argv[]){
     // set default input from STDIN
     char* input = (char*)"-";
     
-    // if there is an operand
+    // if there is an operand other than ps
+    optind++;
     if (optind < argc){
         input = argv[optind++];
     }
@@ -63,7 +63,8 @@ int main(int argc, char* argv[]){
             exit(1);
         }
         
-        PairReads worker(pairlistFile,controlFile,enzymeSite,ligationJunction,insertLength,mapqCutoff);
+        PairReads worker(pairlistFile,controlFile,enzyme,insertLength,mapqCutoff);
+        worker.PrintArgs();
         
         for (std::string line; std::getline(fin,line);){
             if (line[0] == '@') worker.AddHeader(line);
@@ -78,7 +79,11 @@ int main(int argc, char* argv[]){
             exit(1);
         }
         
-        PairReads worker(pairlistFile,controlFile,enzymeSite,ligationJunction,insertLength,mapqCutoff);
+        PairReads worker(pairlistFile,controlFile,enzyme,insertLength,mapqCutoff);
+        worker.PrintArgs();
+        //important performance improvement
+        //unable stdio sync
+        std::ios_base::sync_with_stdio(false);
         
         for (std::string line; std::getline(std::cin,line);){
             if (line[0] == '@') worker.AddHeader(line);
@@ -87,7 +92,21 @@ int main(int argc, char* argv[]){
         worker.PrintStats();
     }
     
-    return 0;
+}
+
+int main(int argc, char* argv[]){
+    if (argc < 2){
+        std::cerr << "Unrecognized command.\n";
+        return 1;
+    }
+    
+    if (std::string(argv[1]) == "ps"){
+        ParseSam(argc,argv);
+        return 0;
+    }
+    
+    std::cerr << "Unrecognized command.\n";
+    return 1;
 }
 
 /******************************************************************/

@@ -29,6 +29,26 @@ bool FindLocalLigationJunction(const std::string &s, const int &p, const std::st
     if (found != std::string::npos) return true;
     else return false;
 }
+/***********************************************/
+//methods for enzyme sequence processing
+std::string EnzymeLigation(const std::string &enzyme){
+    std::size_t cut = enzyme.find("^");
+    if (cut == std::string::npos){
+        std::cerr << "Invalid enzyme, no cutting site \'^\' found in " << enzyme << std::endl;
+        exit(1);        
+    } 
+    std::string enzymeRecognition = enzyme.substr(0,cut) + enzyme.substr(cut+1);
+    return enzymeRecognition.substr(0,enzyme.length()-cut-1)+enzymeRecognition.substr(cut);
+    
+}
+std::string EnzymeSite(const std::string &enzyme){
+    std::size_t cut = enzyme.find("^");
+    if (cut == std::string::npos){
+        std::cerr << "Invalid enzyme, no cutting site \'^\' found in " << enzyme << std::endl;
+        exit(1);        
+    }
+    return enzyme.substr(cut+1);
+}
 
 /**********************************************/
 //Class PairReads
@@ -103,8 +123,7 @@ void PairReads::ProcessPair(){
 
 PairReads::PairReads(const std::string &pairFile,
                      const std::string &controlFile,
-                     const std::string &enzymeSite,
-                     const std::string &ligationJunction,
+                     const std::string &enzyme,
                      const int &insertLength,
                      const int &mapqCutoff)
 {
@@ -118,10 +137,15 @@ PairReads::PairReads(const std::string &pairFile,
         std::cerr << "Unable to write file " << controlFile << std::endl;
         exit(1);
     }
-    this->enzymeSite = enzymeSite;
-    this->ligationJunction = ligationJunction;
+    
+    this->enzymeSite = EnzymeSite(enzyme);
+    this->ligationJunction = EnzymeLigation(enzyme);
     this->insertLength = insertLength;
     this->mapqCutoff = mapqCutoff;
+    
+    //Print used parameters
+    //PrintArgs();
+    
     //initialize variables
     isWaiting = false;
     headerChrInProcess=true;
@@ -213,12 +237,16 @@ void PairReads::WriteControl(const Alignment &p){
     control << p.qname << '\t' << p.rname << '\t' << p.pos << '\t' << "+-"[p.strand] << '\n';
 }
 
+void PairReads::PrintArgs(){
+    std::cout << "Using insert length cutoff: " << insertLength << ", Mapping quality cutoff: " << mapqCutoff << std::endl;
+    std::cout << "Using 5' end signature: " << enzymeSite << ", Ligation junction: " << ligationJunction << std::endl;
+}
 void PairReads::PrintStats(){
-    std::cerr << "total number of read pairs processed: " << totalCount << std::endl;
-    std::cerr << "number of Hi-C contacts: " << hicCount << std::endl;
-    std::cerr << "number of single end read pairs: " << sglCount << std::endl;
-    std::cerr << "number of control reads: " << ctlCount << std::endl;
-    std::cerr << "number of re-ligation read pairs: " << rlgCount << std::endl;
-    std::cerr << "number of junk read pairs: " << jkCount << std::endl;
+    std::cout << "total number of read pairs processed: " << totalCount << std::endl;
+    std::cout << "number of Hi-C contacts: " << hicCount << std::endl;
+    std::cout << "number of single end read pairs: " << sglCount << std::endl;
+    std::cout << "number of control reads: " << ctlCount << std::endl;
+    std::cout << "number of re-ligation read pairs: " << rlgCount << std::endl;
+    std::cout << "number of junk read pairs: " << jkCount << std::endl;
     
 }
