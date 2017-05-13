@@ -8,6 +8,44 @@
 #include "PairReads.h"
 #include <unistd.h>
 
+void ParseSam(int argc, char* argv[]);
+void SortOut(int argc, char* argv[]);
+void Merge(int argc, char* argv[]);
+
+int main(int argc, char* argv[]){
+    if (argc < 2){
+        std::cerr << "Unrecognized command.\n";
+        return 1;
+    }
+    
+    if (std::string(argv[1]) == "ps"){ // parse sam file to extract Hi-C pairs and control
+        ParseSam(argc,argv);
+        return 0;
+    }
+    
+    if (std::string(argv[1]) == "sort"){ // sort Hi-C pairs file and control file 
+        SortOut(argc,argv);
+        return 0;
+    }
+    
+    if (std::string(argv[1]) == "merge"){ // Merge already sorted Hi-C pairs file and control file 
+        Merge(argc,argv);
+        return 0;
+    }
+    std::cerr << "Unrecognized command.\n";
+    return 1;
+}
+
+/******************************************************************/
+
+void SortOut(int argc, char* argv[]){
+}
+
+void Merge(int argc, char* argv[]){
+
+    
+}
+/******************************************************************/
 void ParseSam(int argc, char* argv[]){
     int optc;
     int insertLength = 1000;
@@ -93,20 +131,3 @@ void ParseSam(int argc, char* argv[]){
     }
     
 }
-
-int main(int argc, char* argv[]){
-    if (argc < 2){
-        std::cerr << "Unrecognized command.\n";
-        return 1;
-    }
-    
-    if (std::string(argv[1]) == "ps"){
-        ParseSam(argc,argv);
-        return 0;
-    }
-    
-    std::cerr << "Unrecognized command.\n";
-    return 1;
-}
-
-/******************************************************************/

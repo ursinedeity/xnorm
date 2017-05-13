@@ -7,22 +7,11 @@
 #ifndef _PAIRREADS
 #define _PAIRREADS
 #include "Alignment.h"
+#include "PairsFile.h"
 #include <fstream>
 #include <vector>
 
 #define MAXINSERT 2147183647
-
-struct Chromosome{
-    std::string chrom;
-    int length;
-    Chromosome(const std::string &chrom, const int &length){
-        this->chrom = chrom;
-        this->length = length;
-    }
-    bool operator < (const Chromosome &a) const{
-        return ChromosomeOrder(chrom,a.chrom);
-    }
-};
 
 class PairReads{
 public:
@@ -35,6 +24,7 @@ public:
               const int &insertLength,
               const int &mapqCutoff);
     ~PairReads();
+    void set_genome_assembly(const std::string &genome);
     void PrintStats();
     void PrintArgs();
 private:
@@ -44,7 +34,7 @@ private:
     Alignment *last,*current;
     bool isWaiting;
     
-    std::vector<Chromosome> chromosomes;
+    PairsFileHeader header;
     bool headerChrInProcess;
     
     int totalCount,hicCount,ctlCount,rlgCount,sglCount,jkCount;

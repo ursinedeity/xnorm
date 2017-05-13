@@ -6,7 +6,6 @@
 #include "PairReads.h"
 #include <iostream>
 #include <sstream>
-#include <algorithm>
 
 int InsertSize(const Alignment &p, const Alignment &q){
     if (p.rname != q.rname)
@@ -147,8 +146,10 @@ PairReads::PairReads(const std::string &pairFile,
     //PrintArgs();
     
     //initialize variables
-    isWaiting = false;
     headerChrInProcess=true;
+    header.set_shape("upper triangle");
+    isWaiting = false;
+    
     totalCount=0,hicCount=0,ctlCount=0,rlgCount=0,sglCount=0,jkCount=0;
     last = new Alignment; current = new Alignment;
 }
@@ -158,6 +159,10 @@ PairReads::~PairReads(){
     control.close();
     delete last;
     delete current;
+}
+
+void PairReads::set_genome_assembly(const std::string &genome){
+    header.set_genome_assembly(genome);    
 }
 
 bool Mates(const Alignment &p, const Alignment &q){
@@ -201,22 +206,12 @@ void PairReads::AddHeader(const std::string &line){
             if (field[i].substr(0,2) == "SN") chrom = field[i].substr(3);
             if (field[i].substr(0,2) == "LN") length = std::stoi(field[i].substr(3));
         }
-        chromosomes.push_back(Chromosome(chrom, length));
+        header.add_chromosome(chrom, length);
     }
 }
 
 void PairReads::OutputHeader(){
-    std::sort (chromosomes.begin(), chromosomes.end());
-    pairlist << "## pairs format v1.0\n";
-    pairlist << "#sorted: none\n";
-    pairlist << "#shape: upper triangle\n";
-    
-    if (chromosomes.size() == 0) std::cerr << "chromosome sizes not found, header invalid.\n";
-    
-    for (std::vector<Chromosome>::iterator it=chromosomes.begin(); it!=chromosomes.end(); ++it){
-        pairlist << "#chromsize: " << it->chrom << " " << it->length << '\n';
-    }
-    pairlist << "#columns: readID chr1 pos1 chr2 pos2 strand1 strand2\n";
+    pairlist << header.Representation(true);
     headerChrInProcess = false;
 }
 
