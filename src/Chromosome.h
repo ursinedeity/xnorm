@@ -23,13 +23,20 @@ inline bool ChromosomeOrder(const std::string &chrom1, const std::string &chrom2
 
 struct Chromosome{
     std::string chrom;
-    int length;
+    int length,order;
     Chromosome(const std::string &chrom, const int &length){
         this->chrom = chrom;
         this->length = length;
+        this->order = -1;
+    }
+    Chromosome(const std::string &chrom, const int &length, const int &order){
+        this->chrom = chrom;
+        this->length = length;
+        this->order = order;
     }
     bool operator < (const Chromosome &a) const{
-        return ChromosomeOrder(chrom,a.chrom);
+        if ((order >= 0) && (a.order >= 0)) return order < a.order;
+        else return ChromosomeOrder(chrom,a.chrom);
     }
 };
 

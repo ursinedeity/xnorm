@@ -7,6 +7,7 @@
 #ifndef _PAIRREADS
 #define _PAIRREADS
 #include "Alignment.h"
+#include "PairsFile.h"
 #include <fstream>
 #include <vector>
 
@@ -23,6 +24,7 @@ public:
               const int &insertLength,
               const int &mapqCutoff);
     ~PairReads();
+    void set_genome_assembly(const std::string &genome);
     void PrintStats();
     void PrintArgs();
 private:
@@ -32,7 +34,7 @@ private:
     Alignment *last,*current;
     bool isWaiting;
     
-    std::vector<Chromosome> chromosomes;
+    PairsFileHeader header;
     bool headerChrInProcess;
     
     int totalCount,hicCount,ctlCount,rlgCount,sglCount,jkCount;
