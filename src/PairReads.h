@@ -12,18 +12,6 @@
 
 #define MAXINSERT 2147183647
 
-struct Chromosome{
-    std::string chrom;
-    int length;
-    Chromosome(const std::string &chrom, const int &length){
-        this->chrom = chrom;
-        this->length = length;
-    }
-    bool operator < (const Chromosome &a) const{
-        return ChromosomeOrder(chrom,a.chrom);
-    }
-};
-
 class PairReads{
 public:
     bool AddAlignment(const std::string &line);

@@ -6,12 +6,9 @@
 
 #ifndef _ALIGNMENT
 #define _ALIGNMENT
-
-#include <string>
+#include "Chromosome.h"
 #define UNMAPPED 4
 #define REVERSE 16
-
-bool ChromosomeOrder(const std::string &chrom1, const std::string &chrom2);
 
 struct Alignment{
     bool unmapped,strand,isValid;
