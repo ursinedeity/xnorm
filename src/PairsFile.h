@@ -8,6 +8,7 @@
 #define _PAIRSFILE
 #include "Chromosome.h"
 #include <vector>
+#include <string>
 #include <iostream>
 #include <map>
 

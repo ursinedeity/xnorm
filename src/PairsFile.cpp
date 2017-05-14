@@ -66,17 +66,17 @@ void PairsFileHeader::set_chrom_order(const std::string order[], const unsigned 
     for (unsigned int i=0; i<size; ++i) chromOrder[order[i]] = i;    
 }
 
-// std::vector<int> PairsFileHeader::get_field_order(const std::string order [], const unsigned int &size){
-//     std::vector<int> order;
-//     for (unsigned int i=0; i<size; ++i){
-//         auto p = std::find(columns.begin(),columns.end(),order[i]);
-//         if (p != columns.end())
-//             order.push_back(p - columns.begin());
-//         else
-//             order.push_back(-1);
-//     }
-//     return order;
-// }
+std::vector<int> PairsFileHeader::get_field_order(const std::string forder [], const unsigned int &size){
+    std::vector<int> order;
+    for (unsigned int i=0; i<size; ++i){
+        auto p = std::find(columns.begin(),columns.end(),forder[i]);
+        if (p != columns.end())
+            order.push_back(p - columns.begin());
+        else
+            order.push_back(-1);
+    }
+    return order;
+}
 
 
 std::string PairsFileHeader::Representation(bool sort){

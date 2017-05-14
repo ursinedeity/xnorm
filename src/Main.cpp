@@ -114,10 +114,12 @@ void SortOut(int argc, char* argv[]){
             else ;
         }
     }
-    //std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
+    std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
     
     std::cout << header.Representation(true);
-    //for (auto it = order.begin(); it != order.end(); ++it) std::cout << *it;
+    for (auto it = order.begin(); it != order.end(); ++it) std::cout << *it << ' ';
+    std::cout << std::endl;
+    
 }
 
 void Merge(int argc, char* argv[]){
