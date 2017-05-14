@@ -24,12 +24,12 @@ inline bool ChromosomeOrder(const std::string &chrom1, const std::string &chrom2
 struct Chromosome{
     std::string chrom;
     int length,order;
-    Chromosome(const std::string &chrom, const int &length){
+    Chromosome(const std::string &chrom, const unsigned int &length){
         this->chrom = chrom;
         this->length = length;
         this->order = -1;
     }
-    Chromosome(const std::string &chrom, const int &length, const int &order){
+    Chromosome(const std::string &chrom, const unsigned int &length, const int &order){
         this->chrom = chrom;
         this->length = length;
         this->order = order;

@@ -21,8 +21,8 @@ public:
     PairReads(const std::string &pairFile,
               const std::string &controlFile,
               const std::string &enzyme,
-              const int &insertLength,
-              const int &mapqCutoff);
+              const unsigned int &insertLength,
+              const unsigned int &mapqCutoff);
     ~PairReads();
     void set_genome_assembly(const std::string &genome);
     void PrintStats();
@@ -30,14 +30,14 @@ public:
 private:
     std::ofstream pairlist,control;
     std::string enzymeSite,ligationJunction;
-    int insertLength,mapqCutoff;
+    unsigned int insertLength,mapqCutoff;
     Alignment *last,*current;
     bool isWaiting;
     
     PairsFileHeader header;
     bool headerChrInProcess;
     
-    int totalCount,hicCount,ctlCount,rlgCount,sglCount,jkCount;
+    unsigned int totalCount,hicCount,ctlCount,rlgCount,sglCount,jkCount;
     void ProcessPair();
     void WriteControl(const Alignment &alignment);
     void WritePairlist();

@@ -7,21 +7,21 @@
 #include <iostream>
 #include <sstream>
 
-int InsertSize(const Alignment &p, const Alignment &q){
+unsigned int InsertSize(const Alignment &p, const Alignment &q){
     if (p.rname != q.rname)
         return MAXINSERT;
     else
         return abs(q.pos - p.pos);
 }
 
-int CigarFirstPos(const std::string &cigar){
+unsigned int CigarFirstPos(const std::string &cigar){
     if (cigar[0] == '*')
         return 0;
     else
         return std::stoi(cigar);    
 }
 
-bool FindLocalLigationJunction(const std::string &s, const int &p, const std::string &j){
+bool FindLocalLigationJunction(const std::string &s, const unsigned int &p, const std::string &j){
 //     std::string local = s.substr(std::max(0,          p-int(j.length())),
 //                                         std::min(int(j.length()), int(s.length())-p));
     std::size_t found = s.find(j);
@@ -123,9 +123,11 @@ void PairReads::ProcessPair(){
 PairReads::PairReads(const std::string &pairFile,
                      const std::string &controlFile,
                      const std::string &enzyme,
-                     const int &insertLength,
-                     const int &mapqCutoff)
+                     const unsigned int &insertLength,
+                     const unsigned int &mapqCutoff)
 {
+    const static std::string defaultColumns [] = {"readID","chr1","pos1","chr2","pos2","strand1","strand2"};
+    
     pairlist.open(pairFile.c_str());
     if (!pairlist.is_open()){
         std::cerr << "Unable to write file " << pairFile << std::endl;
@@ -148,6 +150,7 @@ PairReads::PairReads(const std::string &pairFile,
     //initialize variables
     headerChrInProcess=true;
     header.set_shape("upper triangle");
+    header.set_columns(defaultColumns,7);
     isWaiting = false;
     
     totalCount=0,hicCount=0,ctlCount=0,rlgCount=0,sglCount=0,jkCount=0;
@@ -197,12 +200,12 @@ bool PairReads::AddAlignment(const std::string &line){
 void PairReads::AddHeader(const std::string &line){
     std::istringstream linestream(line);
     std::string tag,field[2],chrom="";
-    int length=0;
+    unsigned int length=0;
     
     linestream >> tag >> field[0] >> field[1];
     if (tag == "@SQ"){
         headerChrInProcess = true;
-        for (int i=0; i<2; ++i){
+        for (unsigned int i=0; i<2; ++i){
             if (field[i].substr(0,2) == "SN") chrom = field[i].substr(3);
             if (field[i].substr(0,2) == "LN") length = std::stoi(field[i].substr(3));
         }

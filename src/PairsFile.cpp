@@ -6,22 +6,78 @@
 
 #include "PairsFile.h"
 #include <algorithm>
+#include <sstream>
 
 int PairsFileHeader::ParseHeader(const std::string &line){
-    return 0;
+    std::istringstream linestream(line);
+    std::string f,key,tmp;
+    linestream >> key;
+    if (key == "##"){
+        set_version(line.substr(16));
+        return 0;
+    }
+    
+    if (key == "#sorted:"){
+        set_sorted(line.substr(9));
+        return 0;
+    }
+    
+    if (key == "#shape:"){
+        set_shape(line.substr(8));
+        return 0;
+    }
+    
+    if (key == "#genome_assembly:"){
+        set_genome_assembly(line.substr(18));
+        return 0;
+    }
+    
+    if (key == "#command:"){
+        set_command(line.substr(10));
+        return 0;
+    }
+    
+    if (key == "#chromsize:"){
+        linestream >> f;
+        int length;
+        linestream >> length;
+        add_chromosome(f,length);
+        return 0;
+    }
+    
+    if (key == "#columns:"){
+        while (linestream >> f) add_column(f);
+        return 0;
+    }
+    misc += line + "\n";
+    return 1;
 }
+
+
+
 
 
 PairsFileHeader::PairsFileHeader(){
-    const static std::string defaultColumns [] = {"readID","chr1","pos1","chr2","pos2","strand1","strand2"};
     set_version("v1.0");
-    set_columns(defaultColumns,7);
 }
 
-void PairsFileHeader::set_chrom_order(const std::string order[], const int &size){
+void PairsFileHeader::set_chrom_order(const std::string order[], const unsigned int &size){
     chromOrder.clear();
-    for (int i=0; i<size; ++i) chromOrder[order[i]] = i;    
+    for (unsigned int i=0; i<size; ++i) chromOrder[order[i]] = i;    
 }
+
+// std::vector<int> PairsFileHeader::get_field_order(const std::string order [], const unsigned int &size){
+//     std::vector<int> order;
+//     for (unsigned int i=0; i<size; ++i){
+//         auto p = std::find(columns.begin(),columns.end(),order[i]);
+//         if (p != columns.end())
+//             order.push_back(p - columns.begin());
+//         else
+//             order.push_back(-1);
+//     }
+//     return order;
+// }
+
 
 std::string PairsFileHeader::Representation(bool sort){
     std::string repr = version;
@@ -38,13 +94,17 @@ std::string PairsFileHeader::Representation(bool sort){
     for (auto it = columns.begin(); it != columns.end(); ++it)
         repr += " " + *it;
     
-    repr += "\n";
+    repr += "\n" + misc;
     return repr;
 }
 
 std::string PairsFileHeader::Representation(){
     return Representation(false);
 }
+
+
+
+
 
 
 int PairsFileHeader::get_chrom_id(const std::string &chrom){
@@ -61,6 +121,12 @@ std::string PairsFileHeader::get_chrom_by_id(const unsigned int &id){
     else
         return "";
 }
+
+
+
+
+
+
 
 
 void PairsFileHeader::set_version(const std::string &s){
@@ -82,19 +148,19 @@ void PairsFileHeader::set_genome_assembly(const std::string &s){
 void PairsFileHeader::set_command(const std::string &s){
     command = "#command:" + s + "\n";
 }
-void PairsFileHeader::set_columns(const std::string columns [], const int &size){
-    for (int i=0; i<size; ++i) add_column(columns[i]);
+void PairsFileHeader::set_columns(const std::string columns [], const unsigned int &size){
+    for (unsigned int i=0; i<size; ++i) add_column(columns[i]);
 }
 
-void PairsFileHeader::set_chromosomes(const std::string chrom [], const int length [], const int &size){
-    for (int i=0; i<size; ++i) add_chromosome(chrom[i], length[i]);
+void PairsFileHeader::set_chromosomes(const std::string chrom [], const unsigned int length [], const unsigned int &size){
+    for (unsigned int i=0; i<size; ++i) add_chromosome(chrom[i], length[i]);
 }
 
 void PairsFileHeader::add_column(const std::string &c){
     columns.push_back(c);
 }
 
-void PairsFileHeader::add_chromosome(const std::string &c, const int length){
+void PairsFileHeader::add_chromosome(const std::string &c, const unsigned int length){
     if (chromOrder.empty()){
         chromosomes.push_back(Chromosome(c,length));
         chromMap[c] = chromosomes.size()-1;
@@ -106,6 +172,10 @@ void PairsFileHeader::add_chromosome(const std::string &c, const int length){
         }
     }
 }
+
+
+
+
 
 void PairsFileHeader::sort_chromosome(){
     std::sort (chromosomes.begin(), chromosomes.end());
