@@ -4,7 +4,7 @@
  * Refer to the LICENSE file included.
  */
 
-#include "PairsFile.h"
+#include "PairsFileHeader.h"
 #include <algorithm>
 #include <sstream>
 
