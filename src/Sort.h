@@ -20,6 +20,8 @@ private:
     std::vector<PairsRecord*> records;
     std::vector<Chromosome> chromosomes;
     std::map<std::string, int> chromMap;
+    unsigned int nfields;
+    int shape;
 };
 
 #endif
