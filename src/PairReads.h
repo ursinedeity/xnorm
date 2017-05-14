@@ -7,7 +7,7 @@
 #ifndef _PAIRREADS
 #define _PAIRREADS
 #include "Alignment.h"
-#include "PairsFile.h"
+#include "PairsFileHeader.h"
 #include <fstream>
 #include <vector>
 
