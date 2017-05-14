@@ -51,9 +51,9 @@ std::vector<std::string> split(const std::string &text, char sep) {
 
 void SortOut(int argc, char* argv[]){
     int optc;
-    std::string outfile,corder,forder;
+    std::string outfile,corder,forder,shape("upper triangle");
     std::vector<std::string> chromOrder,fieldOrder;
-    while((optc = getopt(argc,argv,"o:c:f:")) != -1){
+    while((optc = getopt(argc,argv,"o:c:f:s:")) != -1){
         switch (optc) {
             case 'o':
                 outfile = optarg;
@@ -65,6 +65,9 @@ void SortOut(int argc, char* argv[]){
             case 'f':
                 forder = optarg;
                 fieldOrder = split(forder,'-');
+                break;
+            case 's':
+                if (optarg[0] == 'l') shape = "lower triangle";
                 break;
             case '?':
                 exit(1);
@@ -83,7 +86,11 @@ void SortOut(int argc, char* argv[]){
     }
     
     PairsFileHeader header;
+    
+    //using arguments to get chromosome order e.g. -c chr1-chr2-chr3-chr4-...
+    //unspecified chromosome in order will be discared.
     header.set_chrom_order(chromOrder.data(),chromOrder.size());
+    header.set_shape(shape);
     //process pairs file
     if (input[0] != '-'){
         std::ifstream fin (input);
@@ -91,12 +98,19 @@ void SortOut(int argc, char* argv[]){
             std::cerr << "Unable to open file " << input << '\n';
             exit(1);
         }
-        
+        bool processingHeader = false;
         for (std::string line; std::getline(fin,line);){
-            if (line[0] == '#') header.ParseHeader(line);
-            else ;
+            if (line[0] == '#'){
+                header.ParseHeader(line);
+                processingHeader = true;
+            }else{
+                if (processingHeader){
+                    header.sort_chromosome();
+                    processingHeader = false;
+                }
+                //TODO
+            }
         }
-
     }else{
         // Detect if it's terminal
         // Throw an error and exit for terminal input
@@ -108,10 +122,18 @@ void SortOut(int argc, char* argv[]){
         //important performance improvement
         //unable stdio sync
         std::ios_base::sync_with_stdio(false);
-        
+        bool processingHeader = false;
         for (std::string line; std::getline(std::cin,line);){
-            if (line[0] == '#') header.ParseHeader(line);
-            else ;
+            if (line[0] == '#'){
+                header.ParseHeader(line);
+                processingHeader = true;
+            }else{
+                if (processingHeader){
+                    header.sort_chromosome();
+                    processingHeader = false;
+                }
+                //TODO
+            }
         }
     }
     std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());

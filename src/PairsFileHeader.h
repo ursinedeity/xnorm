@@ -4,15 +4,18 @@
  * Refer to the LICENSE file included.
  */
 
-#ifndef _PAIRSFILE
-#define _PAIRSFILE
+#ifndef _PAIRSFILEHEADER
+#define _PAIRSFILEHEADER
 #include "Chromosome.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include <map>
 
+class PairsFileSorter;
+
 class PairsFileHeader{
+friend class PairsFileSorter;
 public:
     int ParseHeader(const std::string &line);
     
