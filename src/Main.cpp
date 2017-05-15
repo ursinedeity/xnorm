@@ -68,7 +68,6 @@ void SortOut(int argc, char* argv[]){
                 break;
             case 'f':
                 forder = optarg;
-                fieldOrder = split(forder,'-');
                 break;
             case 's':
                 if (optarg[0] == 'l') shape = "lower triangle";
@@ -79,6 +78,7 @@ void SortOut(int argc, char* argv[]){
             break;
         }
     }
+    fieldOrder = split(forder,'-');
     
     // set default input from STDIN
     char* input = (char*)"-";
@@ -145,7 +145,7 @@ void SortOut(int argc, char* argv[]){
     for (auto it = order.begin(); it != order.end(); ++it) std::cerr << *it << ' ';
     std::cerr << std::endl;
     
-    //sorter.Sort(order.data(),1);
+    sorter.Sort(order.data(),order.size(),1);
     sorter.PrintRecords();
 }
 

@@ -7,8 +7,44 @@
 #include "Sort.h"
 #include <sstream>
 #include <iostream>
+#include <algorithm>
+/*
+bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *b){
+    static int g_Order [] = {0,2,1,3};
+    for (int i=0; i<4; i++){
+        int r = Spaceship(a->pos[g_Order[i]],b->pos[g_Order[i]]);
+        if (r!=0) return 1-r;
+    }
+    return false;
+}
+*/
 
-void Sort(const int compareOrder [], const int threads){
+bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *b){
+    for (auto it = this->order.begin(); it != this->order.end(); ++it){
+        if ((*it) > 0){
+            int r = Spaceship(a->pos[(*it)-1],b->pos[(*it)-1]);
+            if (r!=0) return 1-r;
+        }else{
+            if ((*it) == 0) return a->readID < b->readID;
+            else{
+                //TODO
+            }
+        }
+    }
+    return false;
+}
+
+
+void PairsFileSorter::Sort(const int compareOrder [], const unsigned int n, const int threads){
+    for (unsigned int i=0; i<n; ++i){
+        order.push_back(compareOrder[i]);
+    }
+    
+    std::cerr << "Sort start\n";
+    //std::sort(records.begin(),records.end(), [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
+    using namespace std::placeholders;
+    std::sort(records.begin(),records.end(), std::bind(&PairsFileSorter::CompareFunction, this, _1, _2));
+    std::cerr << "Sort end\n";
     
 }
 
