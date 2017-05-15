@@ -8,6 +8,7 @@
 #include "PairReads.h"
 #include "Sort.h"
 #include <unistd.h>
+#include <memory>
 
 void ParseSam(int argc, char* argv[]);
 void SortOut(int argc, char* argv[]);
@@ -50,14 +51,32 @@ std::vector<std::string> split(const std::string &text, char sep) {
   return tokens;
 }
 
+std::shared_ptr<std::istream> GetInput(const char* inputFile){
+    std::shared_ptr<std::istream> input;
+    if (inputFile[0] == '-'){
+        if (isatty(fileno(stdin))){
+             std::cerr << "No support for terminal input.\n";
+             exit(1);
+        }
+        std::ios_base::sync_with_stdio(false);
+        input.reset(&std::cin, [](...){});
+        
+    }else
+        input.reset(new std::ifstream(inputFile));
+    
+    return input;    
+}
+
+/*****************************************************************/
 void SortOut(int argc, char* argv[]){
     int optc;
     std::string outfile,corder;
+    std::string genome_assembly;
     std::string forder("chr1-chr2-pos1-pos2");
     std::string shape("upper triangle");
     std::vector<std::string> chromOrder,fieldOrder;
     
-    while((optc = getopt(argc,argv,"o:c:f:s:")) != -1){
+    while((optc = getopt(argc,argv,"o:c:f:g:s:")) != -1){
         switch (optc) {
             case 'o':
                 outfile = optarg;
@@ -68,6 +87,9 @@ void SortOut(int argc, char* argv[]){
                 break;
             case 'f':
                 forder = optarg;
+                break;
+            case 'g':
+                genome_assembly = optarg;
                 break;
             case 's':
                 if (optarg[0] == 'l') shape = "lower triangle";
@@ -81,13 +103,15 @@ void SortOut(int argc, char* argv[]){
     fieldOrder = split(forder,'-');
     
     // set default input from STDIN
-    char* input = (char*)"-";
+    char* inputFile = (char*)"-";
     
     // if there is an operand other than sort
     optind++;
     if (optind < argc){
-        input = argv[optind++];
+        inputFile = argv[optind++];
     }
+    
+    std::shared_ptr<std::istream> input = GetInput(inputFile);
     
     PairsFileHeader header;
     PairsFileSorter sorter;
@@ -96,49 +120,22 @@ void SortOut(int argc, char* argv[]){
     //unspecified chromosome in order will be discared.
     header.set_chrom_order(chromOrder.data(),chromOrder.size());
     header.set_shape(shape);
+    
     //process pairs file
-    if (input[0] != '-'){
-        std::ifstream fin (input);
-        if (!fin.is_open()){
-            std::cerr << "Unable to open file " << input << '\n';
-            exit(1);
-        }
-        
-        std::string line;
-        for (;std::getline(fin,line) && line[0] == '#';){
-            header.ParseHeader(line);
-        }
-        
-        sorter.AddHeader(header);
-        sorter.AddRecord(line);
-        for (;std::getline(fin,line);){
-            sorter.AddRecord(line);
-        }
-    }else{
-        // Detect if it's terminal
-        // Throw an error and exit for terminal input
-        if (isatty(fileno(stdin))){
-            std::cerr << "No support for terminal input.\n";
-            exit(1);
-        }
-        
-        //important performance improvement
-        //unable stdio sync
-        std::ios_base::sync_with_stdio(false);
-        bool processingHeader = false;
-        for (std::string line; std::getline(std::cin,line);){
-            if (line[0] == '#'){
-                header.ParseHeader(line);
-                processingHeader = true;
-            }else{
-                if (processingHeader){
-                    header.sort_chromosome();
-                    processingHeader = false;
-                }
-                //TODO
-            }
-        }
+    std::string line;
+    for (;std::getline(*input,line) && line[0] == '#';){
+        header.ParseHeader(line);
     }
+    header.set_sorted(forder);
+    if (!genome_assembly.empty()) header.set_genome_assembly(genome_assembly);
+    
+    //sorter must have a header to initialize.
+    sorter.AddHeader(header);
+    sorter.AddRecord(line);
+    for (;std::getline(*input,line);){
+        sorter.AddRecord(line);
+    }
+    
     std::cout << header.Representation(true);
     
     std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
@@ -161,20 +158,23 @@ void ParseSam(int argc, char* argv[]){
     std::string pairlistFile("output.pairs");
     std::string controlFile("output.ctl");
     std::string enzyme("^GATC");
-    
+    std::string genome_assembly;
     // parse arguments
     // l:inseart length default 1000bp
     // q:map quality cutoff default 30
     // c:control filename
     // p:pairlist filename
     // e:enzyme cutting site
-    while((optc = getopt(argc,argv,"c:e:l:p:q:")) != -1){
+    while((optc = getopt(argc,argv,"c:e:g:l:p:q:")) != -1){
         switch (optc) {
             case 'c':
                 controlFile = optarg;
                 break;
             case 'e':
                 enzyme = optarg;
+                break;
+            case 'g':
+                genome_assembly = optarg;
                 break;
             case 'l':
                 insertLength = std::stoi(optarg);
@@ -191,51 +191,28 @@ void ParseSam(int argc, char* argv[]){
             break;
         }
     }
-    
+    /*******************Handling Input**********************/
     // set default input from STDIN
-    char* input = (char*)"-";
+    char* inputFile = (char*)"-";
     
     // if there is an operand other than ps
     optind++;
     if (optind < argc){
-        input = argv[optind++];
+        inputFile = argv[optind++];
     }
     
     //process sam file
-    if (input[0] != '-'){
-        std::ifstream fin (input);
-        if (!fin.is_open()){
-            std::cerr << "Unable to open file " << input << '\n';
-            exit(1);
-        }
-        
-        PairReads worker(pairlistFile,controlFile,enzyme,insertLength,mapqCutoff);
-        worker.PrintArgs();
-        
-        for (std::string line; std::getline(fin,line);){
-            if (line[0] == '@') worker.AddHeader(line);
-            else worker.AddAlignment(line);
-        }
-        worker.PrintStats();
-    }else{
-        // Detect if it's terminal
-        // Throw an error and exit for terminal input
-        if (isatty(fileno(stdin))){
-            std::cerr << "No support for terminal input.\n";
-            exit(1);
-        }
-        
-        PairReads worker(pairlistFile,controlFile,enzyme,insertLength,mapqCutoff);
-        worker.PrintArgs();
-        //important performance improvement
-        //unable stdio sync
-        std::ios_base::sync_with_stdio(false);
-        
-        for (std::string line; std::getline(std::cin,line);){
-            if (line[0] == '@') worker.AddHeader(line);
-            else worker.AddAlignment(line);
-        }
-        worker.PrintStats();
+    
+    std::shared_ptr<std::istream> input = GetInput(inputFile);
+    
+    PairReads worker(pairlistFile,controlFile,enzyme,insertLength,mapqCutoff);
+    worker.PrintArgs();
+    
+    if (!genome_assembly.empty()) worker.set_genome_assembly(genome_assembly);
+    for (std::string line; std::getline(*input,line);){
+        if (line[0] == '@') worker.AddHeader(line);
+        else worker.AddAlignment(line);
     }
+    worker.PrintStats();
     
 }
