@@ -6,8 +6,13 @@
 
 #include "Sort.h"
 #include <sstream>
+#include <iostream>
 
-PairsFileSorter::PairsFileSorter(PairsFileHeader &header){
+void Sort(const int compareOrder [], const int threads){
+    
+}
+
+void PairsFileSorter::AddHeader(PairsFileHeader &header){
     header.sort_chromosome();
     this->chromosomes = header.chromosomes;
     this->chromMap = header.chromMap;
@@ -49,4 +54,17 @@ bool PairsFileSorter::AddRecord(const std::string &line){
     
     records.push_back(new PairsRecord(readID,combinedPos,extrafields,shape));
     return true;
+}
+
+void PairsFileSorter::PrintRecords(){
+    for (auto it = records.begin(); it != records.end(); ++it){
+        std::cout << (*it)->readID;
+        for (unsigned int i=0; i<2; ++i){
+            std::cout << '\t' << chromosomes[(*it)->pos[i*2]].chrom << '\t' << (*it)->pos[i*2+1];
+        }
+        for (unsigned int i=0; i<nfields-5; ++i){
+            std::cout << '\t' << (*it)->extrafields[i];
+        }
+        std::cout << '\n';
+    }
 }

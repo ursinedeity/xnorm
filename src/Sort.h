@@ -13,9 +13,11 @@
 
 class PairsFileSorter{
 public:
-    PairsFileSorter(PairsFileHeader &header);
+    void AddHeader(PairsFileHeader &header);
     bool AddRecord(const std::string &line);
     void Sort(const int compareOrder [], const int threads);
+    void PrintRecords();
+    
 private:
     std::vector<PairsRecord*> records;
     std::vector<Chromosome> chromosomes;

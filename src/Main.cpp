@@ -6,6 +6,7 @@
 
 #include "Main.h"
 #include "PairReads.h"
+#include "Sort.h"
 #include <unistd.h>
 
 void ParseSam(int argc, char* argv[]);
@@ -51,8 +52,11 @@ std::vector<std::string> split(const std::string &text, char sep) {
 
 void SortOut(int argc, char* argv[]){
     int optc;
-    std::string outfile,corder,forder,shape("upper triangle");
+    std::string outfile,corder;
+    std::string forder("chr1-chr2-pos1-pos2");
+    std::string shape("upper triangle");
     std::vector<std::string> chromOrder,fieldOrder;
+    
     while((optc = getopt(argc,argv,"o:c:f:s:")) != -1){
         switch (optc) {
             case 'o':
@@ -86,6 +90,7 @@ void SortOut(int argc, char* argv[]){
     }
     
     PairsFileHeader header;
+    PairsFileSorter sorter;
     
     //using arguments to get chromosome order e.g. -c chr1-chr2-chr3-chr4-...
     //unspecified chromosome in order will be discared.
@@ -98,18 +103,16 @@ void SortOut(int argc, char* argv[]){
             std::cerr << "Unable to open file " << input << '\n';
             exit(1);
         }
-        bool processingHeader = false;
-        for (std::string line; std::getline(fin,line);){
-            if (line[0] == '#'){
-                header.ParseHeader(line);
-                processingHeader = true;
-            }else{
-                if (processingHeader){
-                    header.sort_chromosome();
-                    processingHeader = false;
-                }
-                //TODO
-            }
+        
+        std::string line;
+        for (;std::getline(fin,line) && line[0] == '#';){
+            header.ParseHeader(line);
+        }
+        
+        sorter.AddHeader(header);
+        sorter.AddRecord(line);
+        for (;std::getline(fin,line);){
+            sorter.AddRecord(line);
         }
     }else{
         // Detect if it's terminal
@@ -136,12 +139,14 @@ void SortOut(int argc, char* argv[]){
             }
         }
     }
-    std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
-    
     std::cout << header.Representation(true);
-    for (auto it = order.begin(); it != order.end(); ++it) std::cout << *it << ' ';
-    std::cout << std::endl;
     
+    std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
+    for (auto it = order.begin(); it != order.end(); ++it) std::cerr << *it << ' ';
+    std::cerr << std::endl;
+    
+    //sorter.Sort(order.data(),1);
+    sorter.PrintRecords();
 }
 
 void Merge(int argc, char* argv[]){
