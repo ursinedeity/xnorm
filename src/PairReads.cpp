@@ -90,7 +90,7 @@ void PairReads::ProcessPair(){
                 
                 //Check whether they are control pairs or reads
                 if (last->isValid & current->isValid){
-                    if (last->pos*(last->strand*2-1) + current->pos*(current->strand*2-1) <= 0){
+                    if (last->pos*(last->strand*2-1) + current->pos*(current->strand*2-1) >= 0){
                         //check if it's FR orientaion
                         ctlCount = ctlCount+2;
                         WriteControl(*last);
