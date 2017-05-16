@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <thread>
 #include <fstream>
+
 /*
 bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *b){
     static int g_Order [] = {0,2,1,3};
@@ -125,26 +126,19 @@ bool PairsFileSorter::AddRecord(const std::string &line){
     return true;
 }
 
-void PairsFileSorter::PrintRecords(std::string &outfile){
-    std::ofstream output(outfile.c_str());
-    if (!output.is_open()){
-        std::cerr << "Unable to write file " << outfile << std::endl;
-        exit(1);
-    }
+void PairsFileSorter::PrintRecords(std::shared_ptr<std::ostream> &output){
     //first write headerRepresentation
-    output << headerRepresentation;
+    *output << headerRepresentation;
     
     //output records
     for (auto it = records.begin(); it != records.end(); ++it){
-        output << (*it)->readID;
+        *output << (*it)->readID;
         for (unsigned int i=0; i<2; ++i){
-            output << '\t' << chromosomes[(*it)->pos[i*2]].chrom << '\t' << (*it)->pos[i*2+1];
+            *output << '\t' << chromosomes[(*it)->pos[i*2]].chrom << '\t' << (*it)->pos[i*2+1];
         }
         for (unsigned int i=0; i<nfields-5; ++i){
-            output << '\t' << (*it)->extrafields[i];
+            *output << '\t' << (*it)->extrafields[i];
         }
-        output << '\n';
+        *output << '\n';
     }
-    
-    output.close();
 }

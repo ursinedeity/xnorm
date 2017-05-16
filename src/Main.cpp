@@ -67,11 +67,21 @@ std::shared_ptr<std::istream> GetInput(const char* inputFile){
     return input;    
 }
 
+std::shared_ptr<std::ostream> GetOutput(const char* outputFile){
+    std::shared_ptr<std::ostream> output;
+    if (outputFile[0] == '-'){
+        output.reset(&std::cout, [](...){});
+    }else
+        output.reset(new std::ofstream(outputFile));
+    
+    return output;    
+}
+
 /*****************************************************************/
 void SortOut(int argc, char* argv[]){
     int optc;
     unsigned int threads=1;
-    std::string outfile("sorted.pairs");
+    std::string outfile("-");
     std::string corder,genome_assembly;
     std::string forder("chr1-chr2-pos1-pos2");
     std::string shape("upper triangle");
@@ -145,7 +155,9 @@ void SortOut(int argc, char* argv[]){
 //     std::cerr << std::endl;
     
     sorter.Sort(order.data(),order.size(),threads);
-    sorter.PrintRecords(outfile);
+
+    std::shared_ptr<std::ostream> output = GetOutput(outfile.c_str());
+    sorter.PrintRecords(output);
 }
 
 void Merge(int argc, char* argv[]){

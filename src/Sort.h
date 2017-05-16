@@ -10,7 +10,7 @@
 #include "PairsFileHeader.h"
 #include <vector>
 #include <string>
-
+#include <memory>
 inline int Spaceship(const int &lhs, const int &rhs) {
     if (lhs < rhs) return -1;
     if (rhs < lhs) return 1;
@@ -22,7 +22,7 @@ public:
     PairsFileSorter(PairsFileHeader &header);
     bool AddRecord(const std::string &line);
     void Sort(const int compareOrder [], const unsigned int n, const unsigned int threads);
-    void PrintRecords(std::string &outfile);
+    void PrintRecords(std::shared_ptr<std::ostream> &output);
     
 private:
     bool CompareFunction (const PairsRecord *a, const PairsRecord *b);
