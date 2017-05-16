@@ -45,11 +45,11 @@ void PairsFileSorter::ThreadMergeSort(std::vector<unsigned int> &range, unsigned
         std::inplace_merge(records.begin()+range[l], 
                            records.begin()+range[m], 
                            records.begin()+range[r], 
-                           [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
+                           std::bind(&PairsFileSorter::CompareFunction, this, std::placeholders::_1, std::placeholders::_2));
     }else{
         std::sort(records.begin()+range[l], 
                   records.begin()+range[r], 
-                  [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
+                  std::bind(&PairsFileSorter::CompareFunction, this, std::placeholders::_1, std::placeholders::_2));
     }
 }
 
