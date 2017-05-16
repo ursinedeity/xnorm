@@ -71,8 +71,8 @@ std::shared_ptr<std::istream> GetInput(const char* inputFile){
 void SortOut(int argc, char* argv[]){
     int optc;
     unsigned int threads=1;
-    std::string outfile,corder;
-    std::string genome_assembly;
+    std::string outfile("sorted.pairs");
+    std::string corder,genome_assembly;
     std::string forder("chr1-chr2-pos1-pos2");
     std::string shape("upper triangle");
     std::vector<std::string> chromOrder,fieldOrder;
@@ -118,7 +118,7 @@ void SortOut(int argc, char* argv[]){
     std::shared_ptr<std::istream> input = GetInput(inputFile);
     
     PairsFileHeader header;
-    PairsFileSorter sorter;
+    
     
     //using arguments to get chromosome order e.g. -c chr1-chr2-chr3-chr4-...
     //unspecified chromosome in order will be discared.
@@ -134,21 +134,18 @@ void SortOut(int argc, char* argv[]){
     if (!genome_assembly.empty()) header.set_genome_assembly(genome_assembly);
     
     //sorter must have a header to initialize.
-    sorter.AddHeader(header);
+    PairsFileSorter sorter(header);
     sorter.AddRecord(line);
     for (;std::getline(*input,line);){
         sorter.AddRecord(line);
     }
     
-    std::cout << header.Representation(true);
-    
     std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
-    
 //     for (auto it = order.begin(); it != order.end(); ++it) std::cerr << *it << ' ';
 //     std::cerr << std::endl;
     
     sorter.Sort(order.data(),order.size(),threads);
-    sorter.PrintRecords();
+    sorter.PrintRecords(outfile);
 }
 
 void Merge(int argc, char* argv[]){

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <thread>
+#include <fstream>
 /*
 bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *b){
     static int g_Order [] = {0,2,1,3};
@@ -78,11 +79,13 @@ void PairsFileSorter::Sort(const int compareOrder [], const unsigned int n, cons
     
 }
 
-void PairsFileSorter::AddHeader(PairsFileHeader &header){
+PairsFileSorter::PairsFileSorter(PairsFileHeader &header){
     header.sort_chromosome();
     this->chromosomes = header.chromosomes;
     this->chromMap = header.chromMap;
     this->nfields = header.columns.size();
+    this->headerRepresentation = header.Representation();
+    
     if (header.shape.substr(8) == "upper triangle")
         this->shape = 1;
     else{
@@ -122,15 +125,26 @@ bool PairsFileSorter::AddRecord(const std::string &line){
     return true;
 }
 
-void PairsFileSorter::PrintRecords(){
+void PairsFileSorter::PrintRecords(std::string &outfile){
+    std::ofstream output(outfile.c_str());
+    if (!output.is_open()){
+        std::cerr << "Unable to write file " << outfile << std::endl;
+        exit(1);
+    }
+    //first write headerRepresentation
+    output << headerRepresentation;
+    
+    //output records
     for (auto it = records.begin(); it != records.end(); ++it){
-        std::cout << (*it)->readID;
+        output << (*it)->readID;
         for (unsigned int i=0; i<2; ++i){
-            std::cout << '\t' << chromosomes[(*it)->pos[i*2]].chrom << '\t' << (*it)->pos[i*2+1];
+            output << '\t' << chromosomes[(*it)->pos[i*2]].chrom << '\t' << (*it)->pos[i*2+1];
         }
         for (unsigned int i=0; i<nfields-5; ++i){
-            std::cout << '\t' << (*it)->extrafields[i];
+            output << '\t' << (*it)->extrafields[i];
         }
-        std::cout << '\n';
+        output << '\n';
     }
+    
+    output.close();
 }

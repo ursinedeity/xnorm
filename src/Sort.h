@@ -19,15 +19,16 @@ inline int Spaceship(const int &lhs, const int &rhs) {
 
 class PairsFileSorter{
 public:
-    void AddHeader(PairsFileHeader &header);
+    PairsFileSorter(PairsFileHeader &header);
     bool AddRecord(const std::string &line);
     void Sort(const int compareOrder [], const unsigned int n, const unsigned int threads);
-    void PrintRecords();
+    void PrintRecords(std::string &outfile);
     
 private:
     bool CompareFunction (const PairsRecord *a, const PairsRecord *b);
     void ThreadMergeSort(std::vector<unsigned int> &range, unsigned int l, unsigned int r);
     
+    std::string headerRepresentation;
     std::vector<PairsRecord*> records;
     std::vector<Chromosome> chromosomes;
     std::map<std::string, int> chromMap;
