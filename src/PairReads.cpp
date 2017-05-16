@@ -92,9 +92,11 @@ void PairReads::ProcessPair(){
                 if (last->isValid & current->isValid){
                     if (last->pos*(last->strand*2-1) + current->pos*(current->strand*2-1) >= 0){
                         //check if it's FR orientaion
-                        ctlCount = ctlCount+2;
+                        ctlCount = ctlCount+1;
                         WriteControl(*last);
                         WriteControl(*current);
+                    }else{
+                        jkCount++;
                     }
                 }else{
                     if (last->isValid){ctlCount++; WriteControl(*last);} 
@@ -243,7 +245,7 @@ void PairReads::PrintStats(){
     std::cout << "total number of read pairs processed: " << totalCount << std::endl;
     std::cout << "number of Hi-C contacts: " << hicCount << std::endl;
     std::cout << "number of single end read pairs: " << sglCount << std::endl;
-    std::cout << "number of control reads: " << ctlCount << std::endl;
+    std::cout << "number of control read pairs: " << ctlCount << std::endl;
     std::cout << "number of re-ligation read pairs: " << rlgCount << std::endl;
     std::cout << "number of junk read pairs: " << jkCount << std::endl;
     
