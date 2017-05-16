@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <thread>
 /*
 bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *b){
     static int g_Order [] = {0,2,1,3};
@@ -33,17 +34,46 @@ bool PairsFileSorter::CompareFunction (const PairsRecord *a, const PairsRecord *
     }
     return false;
 }
+void PairsFileSorter::ThreadMergeSort(std::vector<unsigned int> &range, unsigned int l, unsigned int r){
+    if (r > l+1){
+        unsigned int m = (l+r)/2;
+        std::thread sort_thread1([this, &range, l, m] {ThreadMergeSort(std::ref(range), l, m);});
+        std::thread sort_thread2([this, &range, m, r] {ThreadMergeSort(std::ref(range), m, r);});
+        sort_thread1.join();
+        sort_thread2.join();
+        std::inplace_merge(records.begin()+range[l], 
+                           records.begin()+range[m], 
+                           records.begin()+range[r], 
+                           [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
+    }else{
+        std::sort(records.begin()+range[l], 
+                  records.begin()+range[r], 
+                  [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
+    }
+}
 
-
-void PairsFileSorter::Sort(const int compareOrder [], const unsigned int n, const int threads){
+void PairsFileSorter::Sort(const int compareOrder [], const unsigned int n, const unsigned int threads){
     for (unsigned int i=0; i<n; ++i){
         order.push_back(compareOrder[i]);
     }
-    
+
     std::cerr << "Sort start\n";
-    //std::sort(records.begin(),records.end(), [this](const PairsRecord *a, const PairsRecord *b) {return CompareFunction(a, b); });
-    using namespace std::placeholders;
-    std::sort(records.begin(),records.end(), std::bind(&PairsFileSorter::CompareFunction, this, _1, _2));
+    
+    //prepare task
+    std::vector<unsigned int> range;
+    unsigned int step = records.size() / threads;
+    unsigned int begin=0;
+    for (unsigned int i=0; i<threads; ++i){
+        range.push_back(begin);
+        begin += step;
+    }
+    range.push_back(records.size());
+    
+    
+    ThreadMergeSort(range,0,range.size()-1);
+    //
+    //using namespace std::placeholders;
+    //std::sort(records.begin(),records.end(), std::bind(&PairsFileSorter::CompareFunction, this, _1, _2));
     std::cerr << "Sort end\n";
     
 }

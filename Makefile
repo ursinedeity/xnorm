@@ -6,13 +6,13 @@ TARGET := xnorm
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -Wall -O3 -std=c++0x
+CFLAGS := -Wall -O3 -pthread -std=c++0x
 LIB := 
 INC := -I include
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	@echo " $(CC) $^ -o $(TARGET) $(LIB)"; $(CC) $^ -o $(TARGET) $(LIB)
+	@echo " $(CC) $^ -pthread -o $(TARGET) $(LIB)"; $(CC) $^ -pthread -o $(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)

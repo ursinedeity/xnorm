@@ -70,13 +70,14 @@ std::shared_ptr<std::istream> GetInput(const char* inputFile){
 /*****************************************************************/
 void SortOut(int argc, char* argv[]){
     int optc;
+    unsigned int threads=1;
     std::string outfile,corder;
     std::string genome_assembly;
     std::string forder("chr1-chr2-pos1-pos2");
     std::string shape("upper triangle");
     std::vector<std::string> chromOrder,fieldOrder;
     
-    while((optc = getopt(argc,argv,"o:c:f:g:s:")) != -1){
+    while((optc = getopt(argc,argv,"o:c:f:g:s:t:")) != -1){
         switch (optc) {
             case 'o':
                 outfile = optarg;
@@ -93,6 +94,9 @@ void SortOut(int argc, char* argv[]){
                 break;
             case 's':
                 if (optarg[0] == 'l') shape = "lower triangle";
+                break;
+            case 't':
+                threads = std::stoi(optarg);
                 break;
             case '?':
                 exit(1);
@@ -139,10 +143,11 @@ void SortOut(int argc, char* argv[]){
     std::cout << header.Representation(true);
     
     std::vector<int>  order = header.get_field_order(fieldOrder.data(),fieldOrder.size());
-    for (auto it = order.begin(); it != order.end(); ++it) std::cerr << *it << ' ';
-    std::cerr << std::endl;
     
-    sorter.Sort(order.data(),order.size(),1);
+//     for (auto it = order.begin(); it != order.end(); ++it) std::cerr << *it << ' ';
+//     std::cerr << std::endl;
+    
+    sorter.Sort(order.data(),order.size(),threads);
     sorter.PrintRecords();
 }
 
