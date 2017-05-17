@@ -65,7 +65,7 @@ void PairReads::ProcessPair(){
             WritePairlist();
             
         }else{
-            if (last->HasCuttingSiteSignature(enzymeSite) || current->HasCuttingSiteSignature(enzymeSite)){
+            if (last->HasCuttingSiteSignature(ligationJunction) || current->HasCuttingSiteSignature(ligationJunction)){
                 //potential control reads
                 
                 //Check if there is a religation site in any of the sequences
