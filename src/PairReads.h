@@ -29,7 +29,7 @@ public:
     void PrintArgs();
 private:
     std::ofstream pairlist,control;
-    std::string enzymeSite,ligationJunction;
+    std::string enzymeSite,enzymeSiteReverse,ligationJunction;
     unsigned int insertLength,mapqCutoff;
     Alignment *last,*current;
     bool isWaiting;

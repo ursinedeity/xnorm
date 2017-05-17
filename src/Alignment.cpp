@@ -29,12 +29,12 @@ void Alignment::ParseAlignment(const std::string &line, const int &mapqCutoff){
         isValid = true;
 }
 
-bool Alignment::HasCuttingSiteSignature(const std::string &ligationJunction){
-    unsigned int oneSideLength = ligationJunction.length() / 2;
+bool Alignment::HasCuttingSiteSignature(const std::string &enzymeSite, const std::string &enzymeSiteReverse){
+    unsigned int oneSideLength = enzymeSiteReverse.length();
     if (strand){ //reverse strand
-        return sequence.compare(sequence.length()-oneSideLength, oneSideLength, ligationJunction.substr(0, oneSideLength)) == 0;
+        return sequence.compare(sequence.length()-oneSideLength, oneSideLength, enzymeSiteReverse ) == 0;
     }else{
-        return sequence.compare(0, oneSideLength, ligationJunction.substr(oneSideLength, oneSideLength)) == 0;
+        return sequence.compare(0, oneSideLength, enzymeSite) == 0;
     }
         
 }

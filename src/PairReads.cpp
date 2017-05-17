@@ -65,7 +65,7 @@ void PairReads::ProcessPair(){
             WritePairlist();
             
         }else{
-            if (last->HasCuttingSiteSignature(ligationJunction) || current->HasCuttingSiteSignature(ligationJunction)){
+            if (last->HasCuttingSiteSignature(enzymeSite, enzymeSiteReverse) || current->HasCuttingSiteSignature(enzymeSite, enzymeSiteReverse)){
                 //potential control reads
                 
                 //Check if there is a religation site in any of the sequences
@@ -141,8 +141,10 @@ PairReads::PairReads(const std::string &pairFile,
         exit(1);
     }
     
-    this->enzymeSite = EnzymeSite(enzyme);
+    
     this->ligationJunction = EnzymeLigation(enzyme);
+    this->enzymeSite = this->ligationJunction.substr(ligationJunction.length()/2, ligationJunction.length()/2);
+    this->enzymeSiteReverse = this->ligationJunction.substr(0, ligationJunction.length()/2);
     this->insertLength = insertLength;
     this->mapqCutoff = mapqCutoff;
     

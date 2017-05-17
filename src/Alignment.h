@@ -18,7 +18,7 @@ struct Alignment{
     
     void ParseAlignment(const std::string &line, const int &mapqCutoff);
     
-    bool HasCuttingSiteSignature(const std::string &enzymeSite);
+    bool HasCuttingSiteSignature(const std::string &enzymeSite, const std::string &enzymeSiteReverse);
     bool operator > (const Alignment &a) const;
     //alignment representation
     std::string Representation();
