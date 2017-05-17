@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "PairReads.h"
 #include "Sort.h"
+#include "BuildMatrix.h"
 #include <unistd.h>
 #include <memory>
 
@@ -30,6 +31,11 @@ int main(int argc, char* argv[]){
         return 0;
     }
     
+    if (std::string(argv[1]) == "bm"){ // Merge already sorted Hi-C pairs file and control file 
+        BuildMatrix(argc,argv);
+        return 0;
+    }
+    
     if (std::string(argv[1]) == "merge"){ // Merge already sorted Hi-C pairs file and control file 
         Merge(argc,argv);
         return 0;
@@ -38,6 +44,13 @@ int main(int argc, char* argv[]){
     return 1;
 }
 
+void BuildMatrix(int argc, char* argv[]){
+    if (argc < 2){
+        std::cerr << "Unrecognized command.\n";
+        exit(1);
+    }else
+        BuildMatrixFromPairs(argv[2]);
+}
 /******************************************************************/
 
 std::vector<std::string> split(const std::string &text, char sep) {
