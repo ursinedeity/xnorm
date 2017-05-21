@@ -7,12 +7,15 @@
 #include "Main.h"
 #include "PairReads.h"
 #include "Sort.h"
+#include "Alab.h"
+#include "Builder.h"
 #include <unistd.h>
 #include <memory>
 
 void ParseSam(int argc, char* argv[]);
 void SortOut(int argc, char* argv[]);
 void Merge(int argc, char* argv[]);
+void BuildMatrix(int argc, char* argv[]);
 
 int main(int argc, char* argv[]){
     if (argc < 2){
@@ -30,6 +33,11 @@ int main(int argc, char* argv[]){
         return 0;
     }
     
+    if (std::string(argv[1]) == "bm"){ // Merge already sorted Hi-C pairs file and control file 
+        BuildMatrix(argc,argv);
+        return 0;
+    }
+    
     if (std::string(argv[1]) == "merge"){ // Merge already sorted Hi-C pairs file and control file 
         Merge(argc,argv);
         return 0;
@@ -37,6 +45,7 @@ int main(int argc, char* argv[]){
     std::cerr << "Unrecognized command.\n";
     return 1;
 }
+
 
 /******************************************************************/
 
@@ -78,6 +87,104 @@ std::shared_ptr<std::ostream> GetOutput(const char* outputFile){
 }
 
 /*****************************************************************/
+
+void BuildMatrix(int argc, char* argv[]){
+    int optc;
+    unsigned int resolution = 100000;
+    std::string outfile("-");
+    std::string corder,genome_assembly;
+    std::vector<std::string> chromOrder;
+    
+    while((optc = getopt(argc,argv,"o:c:g:r:")) != -1){
+        switch (optc) {
+            case 'o':
+                outfile = optarg;
+                break;
+            case 'c':
+                corder = optarg;
+                chromOrder = split(corder,'-');
+                break;
+            case 'g':
+                genome_assembly = optarg;
+                break;
+            case 'r':
+                resolution = std::stoi(optarg);
+                break;
+            case '?':
+                exit(1);
+            default:
+            break;
+        }
+    }
+    // set default input from STDIN
+    char* inputFile = (char*)"-";
+    
+    // if there is an operand other than sort
+    optind++;
+    if (optind < argc){
+        inputFile = argv[optind++];
+    }
+    
+    std::shared_ptr<std::istream> input = GetInput(inputFile);
+    
+    PairsFileHeader header;
+    
+    //using arguments to get chromosome order e.g. -c chr1-chr2-chr3-chr4-...
+    //unspecified chromosome in order will be discared.
+    header.set_chrom_order(chromOrder.data(),chromOrder.size());
+    //process pairs file
+    std::string line;
+    for (;std::getline(*input,line) && line[0] == '#';){
+        header.ParseHeader(line);
+    }
+    if (!genome_assembly.empty()) header.set_genome_assembly(genome_assembly);
+    
+    alab::Genome genome = header.MakeGenome();
+    
+//     for (auto &c : genome.chroms)
+//         std::cout << c << ' ';
+    
+    alab::Index index = genome.BinInfo(resolution);
+    
+//     for (auto &b : index.offset)
+//         std::cout << b << ' ';
+//     
+//     std::cout << std::endl;
+    
+    CooBuilder builder(genome, index, resolution);
+    
+    builder.AddPairsLine(line);
+    for (;std::getline(*input,line);){
+        builder.AddPairsLine(line);
+    }
+    
+    //builder.PrintCoo();
+    
+    alab::Matrix *m = builder.BuildCsrMatrix();
+    
+    for (int i = 0; i < m->size+1; i++){
+        std::cout << m->indptr[i] << ' ';
+    }
+    std::cout << std::endl;
+    
+    for (int i = 0; i < m->nnz; i++)
+        std::cout << m->indices[i] << ' ';
+    std::cout << std::endl;
+    
+    for (int i = 0; i < m->nnz; i++)
+        std::cout << m->data[i] << ' ';
+    std::cout << std::endl;
+    
+//     alab::Matrix m;
+//     
+//     unsigned int Ai [] = {1,3,4,2};
+//     unsigned int Aj [] = {2,4,4,1};
+//     float Ax [] = {1,2,3,4};
+//     
+//     m.LoadCoo(Ai,Aj,Ax,5,4);
+    
+
+}
 void SortOut(int argc, char* argv[]){
     int optc;
     unsigned int threads=1;

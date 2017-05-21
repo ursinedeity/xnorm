@@ -182,6 +182,17 @@ void PairsFileHeader::sort_chromosome(){
     for (unsigned int i = 0; i < chromosomes.size(); ++i) chromMap[chromosomes[i].chrom] = i;
 }
 
+alab::Genome PairsFileHeader::MakeGenome(){
+    sort_chromosome();
+    std::vector<std::string> chroms;
+    std::vector<unsigned int> lengths;
+    for (auto &chr : chromosomes){
+        chroms.push_back(chr.chrom);
+        lengths.push_back(chr.length);
+    }
+    
+    return alab::Genome(genome_assembly, chroms, lengths);
+}
 
 /********************************************************************/
 // int main(){

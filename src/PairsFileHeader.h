@@ -7,6 +7,7 @@
 #ifndef _PAIRSFILEHEADER
 #define _PAIRSFILEHEADER
 #include "Chromosome.h"
+#include "Alab.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -42,6 +43,8 @@ public:
     
     std::string Representation();
     std::string Representation(bool sort);
+    
+    alab::Genome MakeGenome();
 private:
     std::string version,sorted,shape,genome_assembly,command,misc;
     std::vector<std::string> columns;
