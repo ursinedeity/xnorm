@@ -19,7 +19,7 @@ bool CompareAllowOneMismatch(const std::string &s, unsigned int l, const std::st
     for (i = 0; (i < t.length()-1) && (s[i+l+linc] == t[i]); ++i);
     for (j = t.length()-1; (j > 0) && (s[j+l+rinc] == t[j]); --j);
 
-    if (i > j)
+    if (i >= j)
         return true;
     
     return false;
