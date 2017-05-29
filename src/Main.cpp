@@ -91,7 +91,7 @@ std::shared_ptr<std::ostream> GetOutput(const char* outputFile){
 void BuildMatrix(int argc, char* argv[]){
     int optc;
     unsigned int resolution = 100000;
-    std::string outfile("-");
+    std::string outfile("output.hcs");
     std::string corder,genome_assembly;
     std::vector<std::string> chromOrder;
     
@@ -240,7 +240,7 @@ void SortOut(int argc, char* argv[]){
     //using arguments to get chromosome order e.g. -c chr1-chr2-chr3-chr4-...
     //unspecified chromosome in order will be discared.
     header.set_chrom_order(chromOrder.data(),chromOrder.size());
-    header.set_shape(shape);
+    
     
     //process pairs file
     std::string line;
@@ -249,6 +249,7 @@ void SortOut(int argc, char* argv[]){
     }
     header.set_sorted(forder);
     if (!genome_assembly.empty()) header.set_genome_assembly(genome_assembly);
+    header.set_shape(shape);
     
     //sorter must have a header to initialize.
     PairsFileSorter sorter(header);
