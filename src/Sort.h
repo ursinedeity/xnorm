@@ -23,7 +23,10 @@ public:
     bool AddRecord(const std::string &line);
     void Sort(const int compareOrder [], const unsigned int n, const unsigned int threads);
     void PrintRecords(std::shared_ptr<std::ostream> &output);
-    
+    ~PairsFileSorter(){
+        for (auto it = records.begin(); it != records.end(); ++it)
+            delete (*it);
+    }
 private:
     bool CompareFunction (const PairsRecord *a, const PairsRecord *b);
     void ThreadMergeSort(std::vector<unsigned int> &range, unsigned int l, unsigned int r);

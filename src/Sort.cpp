@@ -87,10 +87,11 @@ PairsFileSorter::PairsFileSorter(PairsFileHeader &header){
     this->nfields = header.columns.size();
     this->headerRepresentation = header.Representation();
     
-    if (header.shape.substr(8) == "upper triangle")
+    if (header.shape.substr(8) == "upper triangle\n"){
         this->shape = 1;
+    }
     else{
-        if (header.shape.substr(8) == "lower triangle")
+        if (header.shape.substr(8) == "lower triangle\n")
             this->shape = -1;
         else
             this->shape = 0;
