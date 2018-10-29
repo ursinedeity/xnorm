@@ -6,6 +6,7 @@
 #include "PairReads.h"
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 unsigned int InsertSize(const Alignment &p, const Alignment &q){
     if (p.rname != q.rname)
@@ -244,11 +245,28 @@ void PairReads::PrintArgs(){
     std::cout << "Using 5' end signature: " << enzymeSite << ", Ligation junction: " << ligationJunction << std::endl;
 }
 void PairReads::PrintStats(){
-    std::cout << "total number of read pairs processed: " << totalCount << std::endl;
-    std::cout << "number of Hi-C contacts: " << hicCount << std::endl;
-    std::cout << "number of single end read pairs: " << sglCount << std::endl;
-    std::cout << "number of control read pairs: " << ctlCount << std::endl;
-    std::cout << "number of re-ligation read pairs: " << rlgCount << std::endl;
-    std::cout << "number of junk read pairs: " << jkCount << std::endl;
+    std::cout << std::left << "total number of read pairs processed: "
+              << std::setw(20) << std::right 
+              << totalCount << std::endl;
+                 
+    std::cout << std::left << "number of Hi-C contacts:              "
+              << std::setw(20) << std::right 
+              << hicCount << " (" << float(hicCount)/float(totalCount)*100 << "%)" << std::endl;
+                 
+    std::cout << std::left << "number of single end read pairs:      "
+              << std::setw(20) << std::right 
+              << sglCount << " (" << float(sglCount)/float(totalCount)*100 << "%)" << std::endl;
+                 
+    std::cout << std::left << "number of control/dangling read pairs:"
+              << std::setw(20) << std::right 
+              << ctlCount << " (" << float(ctlCount)/float(totalCount)*100 << "%)" << std::endl;
+              
+    std::cout << std::left << "number of re-ligation read pairs:     " 
+              << std::setw(20) << std::right 
+              << rlgCount << " (" << float(rlgCount)/float(totalCount)*100 << "%)" << std::endl;
+              
+    std::cout << std::left << "number of junk read pairs:            " 
+              << std::setw(20) << std::right 
+              << jkCount << " (" << float(jkCount)/float(totalCount)*100 << "%)" << std::endl;
     
 }
